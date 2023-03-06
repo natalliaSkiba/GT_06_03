@@ -1,0 +1,66 @@
+
+(1) найти ко-во завершенных транзакций не в евро на сумму более 100
+
+db.transactions.find(
+	{
+		'currency': {$ne:'eur'},
+		'amount' : {$gt: 100 },
+		'is_completed': true     
+	}
+	)
+(2) для всех пользователей не из Китая и не из Испании увеличить баланс на 20%
+
+db.users.updateMany(
+	{
+		"country" :{ $nin:['China','Spain']
+	}, // filter
+	{
+		{'$inc': {  'balance':  1.2 }
+	}
+	)
+(3) разблокировать пользователей, у которых баланс больше нуля или премиальный статус
+
+db.users.updateMany(
+	{
+	'$or': [
+		{'balance': { '$gt': 0 }},
+		{'status':'premium'}
+		]
+		
+	}, // filter
+	{
+		  '$set': {is_blocked': false}
+	}
+	)
+(4) найти пользователей из Китая, которые заблокированы и имеют нулевой баланс
+
+db.users.find(
+	{
+		"country" :'China',
+		$and': 
+		[
+            	   {is_blocked': true },
+         	   {'balance': 0}
+        	]
+	}	
+	)
+(5) пользователям не из Китая и не из США, имеющим баланс более 5000, установить статус премиум
+
+db.users.updateMany(
+	{
+ 	'$and': [
+		"country" :{ $nin:['China','USA'],
+		'balance': { '$gt': 0 }
+	]
+	}, // filter
+	{
+		 '$set': {'status':'premium'}
+	}
+	)	
+
+
+
+
+
+
+
